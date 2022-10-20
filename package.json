@@ -1,0 +1,26 @@
+{
+  "name": "follow-up",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type":"module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MuriloOBarbieri/follow-up.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MuriloOBarbieri/follow-up/issues"
+  },
+  "homepage": "https://github.com/MuriloOBarbieri/follow-up#readme",
+  "dependencies": {
+    "chalk": "^5.1.2",
+    "date-fns": "^2.29.3",
+    "uuid": "^9.0.0"
+  }
+}
