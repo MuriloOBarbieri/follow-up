@@ -1,45 +1,23 @@
-import { criaUsuario } from '../../src/casos-de-uso/cria-usuario.js';
 import randomEmail from 'random-email';
+import CriaUsuarioCasoDeUso from '../../src/casos-de-uso/cria-usuario.js';
+import ContaRepository from '../../src/repository/conta.reposity.js';
 
-function testcriaUsuario() {
-  const specificEmail = randomEmail();
+function testarCriarUsuario() {
+  const repository = new ContaRepository();
+  const casoDeUso = new CriaUsuarioCasoDeUso(repository);
 
-  const regular = criaUsuario(
-    'Murilo Otavio Barbieri',
-    specificEmail,
-    '123teste456'
+  console.log(
+    '---------------------------------------------------------------'
   );
-
-  const repeatedEmail = criaUsuario(
-    'Murilo Otavio Barbieri',
-    specificEmail,
-    '123teste456'
+  casoDeUso.executa('Murilo', randomEmail(), '6584511');
+  casoDeUso.executa('Otavio', randomEmail(), '2121212');
+  casoDeUso.executa('Barbieri', randomEmail(), '4554545454');
+  casoDeUso.executa('Nome', randomEmail(), '87878778');
+  casoDeUso.executa('', '', '62718925');
+  console.log('Usuario cadastrado com sucesso');
+  console.log(
+    '---------------------------------------------------------------'
   );
-  const invalidEmail = criaUsuario(
-    'Murilo Otavio Barbieri',
-    'invalid email',
-    '123teste456'
-  );
-  const tooShortPassword = criaUsuario(
-    'Murilo Otavio Barbieri',
-    randomEmail(),
-    'Teste123654'
-  );
-
-  const noName = criaUsuario('', randomEmail(), '123teste456');
-  const noEmail = criaUsuario('Murilo Otavio Barbieri', '', '123teste456');
-  const noPassword = criaUsuario('Murilo Otavio Barbieri', randomEmail(), '');
-  const noUserInfo = criaUsuario('', '', '');
-
-  console.log('Creating account: ', regular);
-
-  console.log('Repeated email: ', repeatedEmail);
-  console.log('Invalid email: ', invalidEmail);
-  console.log('Password too short: ', tooShortPassword);
-  console.log('No name: ', noName);
-  console.log('No email: ', noEmail);
-  console.log('No password: ', noPassword);
-  console.log('No user info: ', noUserInfo);
 }
 
-testcriaUsuario();
+testarCriarUsuario();

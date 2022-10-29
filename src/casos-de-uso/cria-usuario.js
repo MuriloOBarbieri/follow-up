@@ -1,12 +1,18 @@
-import { EntidadeConta } from '../entidades/conta.entity.js';
-import { salva } from '../repository/conta.reposity.js';
-import { criaContaValidator } from '../Validadores/cria-conta.validador.js';
+import criaContaValidator from '../Validadores/cria-conta.validador.js';
+import EntidadeConta from '../entidades/conta.entity.js';
 
-export function criaUsuario(name, email, password) {
-  const reasultadoValida = criaContaValidator(name, email, password);
-  if (reasultadoValida.hasErrors) {
-    return reasultadoValida.errors.map((error) => error.message);
+export default class CriaUsuarioCasoDeUso {
+  constructor(contaRepository) {
+    this.contaRepository = contaRepository;
+    this.criaValidador = new criaContaValidator(this.contaRepository);
   }
-  const novoUsuario = new EntidadeConta(name, email, password);
-  return salva(novoUsuario);
+  executa(nome, email, senha) {
+    const validation = this.criaValidador.executa(nome, email, senha);
+    if (validation.temErros) {
+      return validation.erros.map((erro) => erro.mensagem);
+    }
+
+    const novoUsuario = new EntidadeConta(nome, email, senha);
+    return this.contaRepository.salva(novoUsuario);
+  }
 }

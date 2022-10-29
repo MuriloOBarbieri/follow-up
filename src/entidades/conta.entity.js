@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-export class EntidadeConta {
+export default class EntidadeConta {
   constructor(name, email, password) {
     this.id = crypto.randomUUID();
     this.name = name;

@@ -1,54 +1,65 @@
 import validator from 'validator';
-import { EmailExiste } from '../repository/conta.reposity.js';
 
-const validations = [
-  {
-    validation: ({ name }) => validator.isEmpty(name),
-    field: 'name',
-    message: 'preencha o nome',
-  },
-  {
-    validation: ({ password }) => validator.isEmpty(password),
-    field: 'password',
-    message: 'Crie uma senha!',
-  },
-  {
-    validation: ({ password }) => !validator.isLength(password, { min: 8 }),
-    field: 'password',
-    message: 'A senha deve ter no mínimo 8 caracteres',
-  },
-  {
-    validation: ({ email }) => !validator.isEmail(email),
-    field: 'email',
-    message: 'O Email precisa ser valido!',
-  },
-  {
-    validation: ({ email }) => EmailExiste(email),
-    field: 'email',
-    message: 'O email deve ser unico!',
-  },
-];
+export default class criaContaValidator {
+  constructor(contaRepository) {
+    this.contaRepository = contaRepository;
 
-export function criaContaValidator(name, email, password) {
-  const Validacao = {
-    hasErrors: false,
-    errors: [],
-    data: {
-      name,
-      email,
-      password,
-    },
-  };
+    this.validations = [
+      {
+        filter: ({ nome }) => validator.isEmpty(nome),
+        field: 'nome',
+        message: 'Nome vazio',
+      },
+      {
+        filter: ({ senha }) => validator.isEmpty(senha),
+        field: 'senha',
+        message: 'Senha vazia',
+      },
+      {
+        filter: ({ senha }) => !validator.isLength(senha, { min: 8 }),
+        field: 'senha',
+        message: 'Senha precisa conter 8 caracteres',
+      },
+      {
+        filter: ({ email }) => !validator.isEmail(email),
+        field: 'email',
+        message: 'Email deve ser válido',
+      },
+      {
+        filter: ({ email }) =>
+          this.contaRepository
+            .lista()
+            .map((conta) => conta.email)
+            .includes(email),
+        field: 'email',
+        message: 'Email ja existe',
+      },
+    ];
+  }
+  executa(nome, email, senha) {
+    const validationObject = {
+      temErros: false,
+      erros: [],
+      dados: {
+        nome,
+        email,
+        senha,
+      },
+    };
+    this.validations.forEach((validator) => {
+      if (validator.filter({ nome, email, senha })) {
+        this.#Erro(validationObject, validator);
+      }
+    });
 
-  validations.forEach((validator) => {
-    if (validator.validation({ name, email, password })) {
-      Validacao.hasErrors = true;
-      Validacao.errors.push({
-        field: validator.field,
-        message: validator.message,
-      });
-    }
-  });
+    return validationObject;
+  }
 
-  return Validacao;
+  #Erro(validationObject, validator) {
+    validationObject.temErros = true;
+    validationObject.erros.push({
+      campo: validator.field,
+      mensagem: validator.message,
+    });
+  }
 }
