@@ -1,22 +1,29 @@
+import { CriaUsuarioCasoDeUso } from '../casos-de-uso/conta/cria-usuario.js';
+import { EntidadeConta } from '../entidades/conta.entity.js';
+
 export class CriaContaRequest {
-  #CriausuarioUseCase;
+  async executa(req, res) {
+    try {
+      const criaUsuarioCasoDeUso = new CriaUsuarioCasoDeUso();
+      const conta = new EntidadeConta(
+        req?.body?.nome,
+        req?.body?.email,
+        req?.body?.senha
+      );
 
-  constructor(CriausuarioUseCase) {
-    this.#CriausuarioUseCase = CriausuarioUseCase;
-  }
+      const result = await criaUsuarioCasoDeUso.executa(conta);
+      console.log(result);
+      res.status(201);
 
-  async execute(req, res) {
-    const { name, email, password } = req.body;
-    const CriaUsuarioResult = await this.#CriausuarioUseCase.execute(
-      name,
-      email,
-      password
-    );
+      if (result?.erros?.length > 0) {
+        res.status(400);
+      }
 
-    if (Array.isArray(CriaUsuarioResult)) {
-      res.status(400).send(CriaUsuarioResult);
-    } else {
-      res.status(201).send(CriaUsuarioResult.toLiteral());
+      return res.send(result);
+    } catch (err) {
+      console.log(err);
+      res.status(500);
+      res.send(err);
     }
   }
 }

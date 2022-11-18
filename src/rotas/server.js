@@ -1,16 +1,14 @@
 import express from 'express';
+import { CriaContaRequest } from '../http/cria-conta.request.js';
+import { DeletarUsuario } from '../http/remove-conta.request.js';
+const app = express();
+const port = 4000;
 
-export class Server {
-  static #application;
-  static async start(port) {
-    this.#application = express();
+app.use(express.json());
 
-    this.#application.listen(port, () => {
-      console.log(`Servidor iniciado com sucesso em http://localhost:${port}`);
-    });
-  }
+app.post('/conta', new CriaContaRequest().executa);
+app.delete('/conta/:id', new DeletarUsuario().executa);
 
-  static async shutdown() {
-    this.#application.close();
-  }
-}
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
