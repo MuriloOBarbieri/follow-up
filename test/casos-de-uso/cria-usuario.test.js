@@ -1,23 +1,36 @@
-import randomEmail from 'random-email';
-import CriaUsuarioCasoDeUso from '../../src/casos-de-uso/cria-usuario.js';
-import ContaRepository from '../../src/repository/conta.reposity.js';
+import { describe, it, expect, jest } from '@jest/globals';
+import CriaUsuarioCasoDeUso from '../../src/casos-de-uso/cria-usuario';
 
-function testarCriarUsuario() {
-  const repository = new ContaRepository();
-  const casoDeUso = new CriaUsuarioCasoDeUso(repository);
+const userRepositoryMock = {
+  listAll: jest.fn(() => []),
+  save: (user) => user,
+};
 
-  console.log(
-    '---------------------------------------------------------------'
-  );
-  casoDeUso.executa('Murilo', randomEmail(), '6584511');
-  casoDeUso.executa('Otavio', randomEmail(), '2121212');
-  casoDeUso.executa('Barbieri', randomEmail(), '4554545454');
-  casoDeUso.executa('Nome', randomEmail(), '87878778');
-  casoDeUso.executa('', '', '62718925');
-  console.log('Usuario cadastrado com sucesso');
-  console.log(
-    '---------------------------------------------------------------'
-  );
-}
+const usuario = {
+  name: 'Murilo',
+  email: 'Murilo.barbieri@mail.com',
+  password: 'senhateste123',
+};
 
-testarCriarUsuario();
+describe('Teste para criar usuario', () => {
+  it('Devera retornar o usuario criado', async () => {
+    const criaUsuariocasoDeuso = new CriaUsuarioCasoDeUso(userRepositoryMock);
+    const { user } = await criaUsuariocasoDeuso.execute(usuario);
+
+    expect(user).toStrictEqual({
+      id: expect.any(String),
+      name: 'Murilo',
+      email: 'Murilo.barbieri@mail.com',
+      createdDate: expect.stringMatching(/\d{4}(-\d{2}){2}/),
+    });
+  });
+
+  it('Email ja cadastrado', async () => {
+    userRepositoryMock.listAll.mockImplementationOnce(() => [usuario]);
+
+    const criaUsuariocasoDeuso = new CriaUsuarioCasoDeUso(userRepositoryMock);
+    const createUserExecute = () => criaUsuariocasoDeuso.execute(usuario);
+
+    expect(createUserExecute()).resolves.toThrowError();
+  });
+});

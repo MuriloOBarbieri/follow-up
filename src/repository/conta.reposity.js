@@ -1,24 +1,21 @@
-import { fs } from 'file-system';
+import { criaConexao } from '../infra/conexao-banco';
 
-export default class ContaRepository {
-  constructor(patch = 'data/conta.json') {
-    this.patch = patch;
+export class ContaRepository {
+  #criaConexao = new criaConexao();
+
+  async salvar(conta) {
+    const conexao = await this.#criaConexao.conecta();
+
+    const contaCriada = conexao.collection('contas').insertOne({
+      ...conta,
+    });
+
+    return contaCriada;
   }
 
-  salva(conta) {
-    const listaSalva = this.lista();
-    listaSalva.push(conta);
+  async listar() {
+    const conexao = await this.#criaConexao.conecta();
 
-    const data = JSON.stringify(listaSalva);
-    fs.writeFileSync(this.patch, data);
-    return conta;
-  }
-
-  lista() {
-    try {
-      return JSON.parse(fs.readFileSync(this.patch));
-    } catch (error) {
-      return [];
-    }
+    return await conexao.collection('contas').find({}).toArray();
   }
 }
